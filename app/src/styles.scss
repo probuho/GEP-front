@@ -1,6 +1,6 @@
 // Variables
-$primary-color: #2D3142;
-$secondary-color: #4F5D75;
+$primary-color: #c5f7f0;
+$secondary-color: #a9c2c9;
 $white-color: #FFFFFF;
 $enfasis-color: #EF8354;
 $button-color: #6F8354;
@@ -200,6 +200,11 @@ footer {
   background-color: #ffffff;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
   padding: 0.8rem 1.5rem;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  z-index: 1000;
 }
 
 .header-content {
@@ -277,7 +282,7 @@ footer {
 
 .main-content {
   flex: 1;
-  padding: 2rem;
+  padding: 5.5rem 2rem 2rem 2rem;
 }
 
 .main-footer {

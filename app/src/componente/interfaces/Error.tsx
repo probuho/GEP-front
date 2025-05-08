@@ -3,4 +3,4 @@ interface RespuestaError {
     error?: string;
 }
 
-export default RespuestaError
+export default RespuestaError;

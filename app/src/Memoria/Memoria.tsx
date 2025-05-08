@@ -29,7 +29,7 @@ const Memoria = () => {
   const [gameOver, setGameOver] = useState(false); //Finalizo la partida
   const [volteada, setVolteada] = useState(false); //Estado para la animación de volteada
   const [error, setError] = useState<string | null>(null); //Errores
-  const [, setVictoria] = useState(false); //Victoria
+  const [victoria, setVictoria] = useState(false); //Victoria
   const { auth } = useAuth(); //Datos del usuario
 
   useEffect(() => {

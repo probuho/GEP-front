@@ -147,15 +147,17 @@ const PaginaRegistro = () => {
                             onChange={(e) => setVerificarContraseña(e.target.value)}
                         />
                     </div>
-                    <label> {/* Opción para mostrat la contraseña */}
-                        Mostrar Contraseña
-                        <input
-                            type="checkbox"
-                            name="checkbox"
-                            checked={mostrarContraseña}
-                            onChange={() => setMostrarContraseña(!mostrarContraseña)}
-                        />
-                    </label>
+                    <div className="mb-2">
+                        <label className="d-flex align-items-center">
+                            <input
+                                type="checkbox"
+                                className="me-2"
+                                checked={mostrarContraseña}
+                                onChange={() => setMostrarContraseña(!mostrarContraseña)}
+                            />
+                            Mostrar Contraseña
+                        </label>
+                    </div>
                     <button className="btn">Registrarse</button>
                     {errorRegistro && <p className="mensaje-error">{errorRegistro}</p>} {/* Render condicional en caso de error */}
                     {errorGeneral && <p className="mensaje-error">{errorGeneral}</p>}

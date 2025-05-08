@@ -171,6 +171,18 @@ const Sightings: React.FC = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
+  // Estados para paginación de avistamientos
+  const [currentSightingsPage, setCurrentSightingsPage] = useState(1);
+  const sightingsPageSize = 10;
+  const totalSightingsPages = Math.ceil(sampleSightings.length / sightingsPageSize);
+  const paginatedSightings = sampleSightings.slice((currentSightingsPage - 1) * sightingsPageSize, currentSightingsPage * sightingsPageSize);
+
+  // Estados para paginación de especies
+  const [currentSpeciesPage, setCurrentSpeciesPage] = useState(1);
+  const speciesPageSize = 10;
+  const totalSpeciesPages = Math.ceil(filteredSpecies.length / speciesPageSize);
+  const paginatedSpecies = filteredSpecies.slice((currentSpeciesPage - 1) * speciesPageSize, currentSpeciesPage * speciesPageSize);
+
   // Datos de ejemplo para especies
   const sampleSpecies: SpeciesItem[] = [
     {
@@ -244,6 +256,11 @@ const Sightings: React.FC = () => {
       );
       setFilteredSpecies(filtered);
     }
+  }, [searchTerm, species]);
+
+  // Reiniciar página al buscar
+  useEffect(() => {
+    setCurrentSpeciesPage(1);
   }, [searchTerm, species]);
 
   // Función para obtener especies desde la API
@@ -337,7 +354,7 @@ const Sightings: React.FC = () => {
       {activeTab === 'sightings' && (
         <>
           <SightingGrid>
-            {sampleSightings.map(sighting => (
+            {paginatedSightings.map(sighting => (
               <SightingCard key={sighting.id}>
                 <SightingContent>
                   <SightingTitle>{sighting.title}</SightingTitle>
@@ -355,6 +372,23 @@ const Sightings: React.FC = () => {
               </SightingCard>
             ))}
           </SightingGrid>
+          
+          {/* Controles de paginación para avistamientos */}
+          {totalSightingsPages > 1 && (
+            <div style={{ display: 'flex', justifyContent: 'center', marginTop: '1rem', gap: '0.5rem' }}>
+              <button onClick={() => setCurrentSightingsPage(p => Math.max(1, p - 1))} disabled={currentSightingsPage === 1}>Anterior</button>
+              {Array.from({ length: totalSightingsPages }, (_, i) => (
+                <button
+                  key={i + 1}
+                  onClick={() => setCurrentSightingsPage(i + 1)}
+                  style={{ fontWeight: currentSightingsPage === i + 1 ? 'bold' : 'normal' }}
+                >
+                  {i + 1}
+                </button>
+              ))}
+              <button onClick={() => setCurrentSightingsPage(p => Math.min(totalSightingsPages, p + 1))} disabled={currentSightingsPage === totalSightingsPages}>Siguiente</button>
+            </div>
+          )}
           
           <FeaturedContainer>
             <FeaturedHeader>
@@ -436,7 +470,12 @@ const Sightings: React.FC = () => {
           </SearchContainer>
           
           {loading ? (
-            <LoadingContainer>Cargando catálogo de especies...</LoadingContainer>
+            <LoadingContainer>
+              <div style={{display:'flex', flexDirection:'column', alignItems:'center', width:'100%'}}>
+                <div className="cargando-spinner" style={{marginBottom:'16px'}}></div>
+                <span style={{fontSize:'1.2rem', color:'#EF8354', fontWeight:'bold'}}>Cargando catálogo de especies...</span>
+              </div>
+            </LoadingContainer>
           ) : error ? (
             <ErrorContainer>{error}</ErrorContainer>
           ) : (
@@ -452,8 +491,8 @@ const Sightings: React.FC = () => {
                 </tr>
               </TableHead>
               <TableBody>
-                {filteredSpecies.length > 0 ? (
-                  filteredSpecies.map(item => (
+                {paginatedSpecies.length > 0 ? (
+                  paginatedSpecies.map(item => (
                     <tr key={item.id}>
                       <td>{item.nombre}</td>
                       <td>
@@ -489,6 +528,23 @@ const Sightings: React.FC = () => {
                 )}
               </TableBody>
             </SpeciesTable>
+          )}
+          
+          {/* Controles de paginación para especies */}
+          {totalSpeciesPages > 1 && (
+            <div style={{ display: 'flex', justifyContent: 'center', marginTop: '1rem', gap: '0.5rem' }}>
+              <button onClick={() => setCurrentSpeciesPage(p => Math.max(1, p - 1))} disabled={currentSpeciesPage === 1}>Anterior</button>
+              {Array.from({ length: totalSpeciesPages }, (_, i) => (
+                <button
+                  key={i + 1}
+                  onClick={() => setCurrentSpeciesPage(i + 1)}
+                  style={{ fontWeight: currentSpeciesPage === i + 1 ? 'bold' : 'normal' }}
+                >
+                  {i + 1}
+                </button>
+              ))}
+              <button onClick={() => setCurrentSpeciesPage(p => Math.min(totalSpeciesPages, p + 1))} disabled={currentSpeciesPage === totalSpeciesPages}>Siguiente</button>
+            </div>
           )}
         </>
       )}

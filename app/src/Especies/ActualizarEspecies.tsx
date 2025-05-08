@@ -48,44 +48,52 @@ const ActualizarEspecies = () => {
         fetchEspecie();
     }, [id, auth?.token]);
 
-    const Update = (e: { preventDefault: () => void; }) => {
-        e.preventDefault();
-        if (!especie) return;
+    const validarDatos = () => {
+        if (!especie?.nombre?.trim()) {
+            setError("El nombre es requerido");
+            return false;
+        }
+        if (especie.tamano < 0) {
+            setError("El tamaño no puede ser negativo");
+            return false;
+        }
+        if (especie.peso < 0) {
+            setError("El peso no puede ser negativo");
+            return false;
+        }
+        return true;
+    };
 
-        // Creación de un nuevo objeto con los datos a actualizar
-        const dataActualizada = {
-            nombre: especie.nombre,
-            tamano: especie.tamano,
-            peso: especie.peso,
-            habitat: especie.habitat,
-            alimentacion: especie.alimentacion,
-            tipo: especie.tipo,
-            descripcion: especie.descripcion,
-        };
-        axios.put(`${BACKEND_URL}/especies/${id}`, dataActualizada, {
-            headers: {
-                Authorization: `Bearer ${auth?.token}`
+    const Update = async (e: React.FormEvent) => {
+        e.preventDefault();
+        setError(null);
+        
+        if (!validarDatos()) {
+            return;
+        }
+
+        try {
+            const response = await axios.put(`${BACKEND_URL}/especies/${id}`, especie, {
+                headers: {
+                    Authorization: `Bearer ${auth?.token}`
+                }
+            });
+            if (response.status === 200) {
+                navigate('/');
             }
-        })
-        .then(result => {
-            console.log(result)
-            navigate("/")
-        })
-        .catch((err: unknown) => {
-            if (axios.isAxiosError(err)) {
-                const axiosError = err as AxiosError;
+        } catch (error: unknown) {
+            if (axios.isAxiosError(error)) {
+                const axiosError = error as AxiosError;
                 if (axiosError.response) {
                     const responseData = axiosError.response.data as RespuestaError;
-                    setError(responseData.error || "Error al actualizar la especie. Por favor intente de nuevo.");
+                    setError(responseData.error || "Error al actualizar la especie");
                 } else {
-                    setError("Error al actualizar la especie. Por favor intente de nuevo.");
+                    setError("Error al actualizar la especie");
                 }
-            } else {
-                setError("Error al actualizar la especie. Por favor intente de nuevo.");
             }
-            console.error("Error al actualizar la especie:", err);
-        });
+        }
     };
+
     if (loading) {
         return <div>Cargando los datos de la especie...</div>;
     }

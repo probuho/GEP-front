@@ -37,6 +37,20 @@ import {
 
 const Community: React.FC = () => {
   const [activeTabIndex, setActiveTabIndex] = useState(0);
+  const [currentDiscussionPage, setCurrentDiscussionPage] = useState(1);
+  const discussionPageSize = 5;
+  const totalDiscussionPages = Math.ceil(popularDiscussions.length / discussionPageSize);
+  const paginatedDiscussions = popularDiscussions.slice((currentDiscussionPage - 1) * discussionPageSize, currentDiscussionPage * discussionPageSize);
+
+  const [currentWikiPage, setCurrentWikiPage] = useState(1);
+  const wikiPageSize = 5;
+  const totalWikiPages = Math.ceil(wikiArticles.length / wikiPageSize);
+  const paginatedWikiArticles = wikiArticles.slice((currentWikiPage - 1) * wikiPageSize, currentWikiPage * wikiPageSize);
+
+  const [currentActivityPage, setCurrentActivityPage] = useState(1);
+  const activityPageSize = 5;
+  const totalActivityPages = Math.ceil(recentActivities.length / activityPageSize);
+  const paginatedActivities = recentActivities.slice((currentActivityPage - 1) * activityPageSize, currentActivityPage * activityPageSize);
 
   const tabs: ForumTab[] = [
     { id: 'all', name: 'Todos los Temas' },
@@ -273,7 +287,7 @@ const Community: React.FC = () => {
 
       <SectionTitle>Discusiones Populares</SectionTitle>
       <DiscussionList>
-        {popularDiscussions.map((discussion) => (
+        {paginatedDiscussions.map((discussion) => (
           <DiscussionItem key={discussion.id}>
             <div className="avatar">
               <img src={discussion.user.avatar} alt="Avatar del usuario" />
@@ -295,10 +309,26 @@ const Community: React.FC = () => {
         ))}
       </DiscussionList>
 
+      {totalDiscussionPages > 1 && (
+        <div style={{ display: 'flex', justifyContent: 'center', marginTop: '1rem', gap: '0.5rem' }}>
+          <button onClick={() => setCurrentDiscussionPage(p => Math.max(1, p - 1))} disabled={currentDiscussionPage === 1}>Anterior</button>
+          {Array.from({ length: totalDiscussionPages }, (_, i) => (
+            <button
+              key={i + 1}
+              onClick={() => setCurrentDiscussionPage(i + 1)}
+              style={{ fontWeight: currentDiscussionPage === i + 1 ? 'bold' : 'normal' }}
+            >
+              {i + 1}
+            </button>
+          ))}
+          <button onClick={() => setCurrentDiscussionPage(p => Math.min(totalDiscussionPages, p + 1))} disabled={currentDiscussionPage === totalDiscussionPages}>Siguiente</button>
+        </div>
+      )}
+
       <WikiArticlesSection>
         <SectionTitle>Artículos Destacados de la Wiki</SectionTitle>
         <WikiArticlesList>
-          {wikiArticles.map((article) => (
+          {paginatedWikiArticles.map((article) => (
             <WikiArticleItem key={article.id} theme={{ starred: article.isStarred }}>
               <div className="article-icon">📄</div>
               <div className="article-info">
@@ -319,10 +349,26 @@ const Community: React.FC = () => {
         </WikiArticlesList>
       </WikiArticlesSection>
 
+      {totalWikiPages > 1 && (
+        <div style={{ display: 'flex', justifyContent: 'center', marginTop: '1rem', gap: '0.5rem' }}>
+          <button onClick={() => setCurrentWikiPage(p => Math.max(1, p - 1))} disabled={currentWikiPage === 1}>Anterior</button>
+          {Array.from({ length: totalWikiPages }, (_, i) => (
+            <button
+              key={i + 1}
+              onClick={() => setCurrentWikiPage(i + 1)}
+              style={{ fontWeight: currentWikiPage === i + 1 ? 'bold' : 'normal' }}
+            >
+              {i + 1}
+            </button>
+          ))}
+          <button onClick={() => setCurrentWikiPage(p => Math.min(totalWikiPages, p + 1))} disabled={currentWikiPage === totalWikiPages}>Siguiente</button>
+        </div>
+      )}
+
       <RecentActivitySection>
         <SectionTitle>Actividad Reciente</SectionTitle>
         <ActivityList>
-          {recentActivities.map((activity) => (
+          {paginatedActivities.map((activity) => (
             <ActivityItem key={activity.id}>
               <div className="avatar">
                 <img src={activity.user.avatar} alt={activity.user.name} />
@@ -341,6 +387,22 @@ const Community: React.FC = () => {
           ))}
         </ActivityList>
       </RecentActivitySection>
+
+      {totalActivityPages > 1 && (
+        <div style={{ display: 'flex', justifyContent: 'center', marginTop: '1rem', gap: '0.5rem' }}>
+          <button onClick={() => setCurrentActivityPage(p => Math.max(1, p - 1))} disabled={currentActivityPage === 1}>Anterior</button>
+          {Array.from({ length: totalActivityPages }, (_, i) => (
+            <button
+              key={i + 1}
+              onClick={() => setCurrentActivityPage(i + 1)}
+              style={{ fontWeight: currentActivityPage === i + 1 ? 'bold' : 'normal' }}
+            >
+              {i + 1}
+            </button>
+          ))}
+          <button onClick={() => setCurrentActivityPage(p => Math.min(totalActivityPages, p + 1))} disabled={currentActivityPage === totalActivityPages}>Siguiente</button>
+        </div>
+      )}
 
       <CommunityCardsGrid>
         {communityCards.map((card) => (

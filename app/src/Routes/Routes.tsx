@@ -34,6 +34,15 @@ import {
 
 const Routes: React.FC = () => {
   const [activeTabIndex, setActiveTabIndex] = useState(0);
+  const [currentFeaturedPage, setCurrentFeaturedPage] = useState(1);
+  const featuredPageSize = 6;
+  const totalFeaturedPages = Math.ceil(featuredRoutes.length / featuredPageSize);
+  const paginatedFeaturedRoutes = featuredRoutes.slice((currentFeaturedPage - 1) * featuredPageSize, currentFeaturedPage * featuredPageSize);
+
+  const [currentRecentPage, setCurrentRecentPage] = useState(1);
+  const recentPageSize = 6;
+  const totalRecentPages = Math.ceil(recentlyAddedRoutes.length / recentPageSize);
+  const paginatedRecentlyAddedRoutes = recentlyAddedRoutes.slice((currentRecentPage - 1) * recentPageSize, currentRecentPage * recentPageSize);
 
   const tabs: RouteTab[] = [
     { id: 'all', name: 'Todas las Rutas' },
@@ -173,7 +182,7 @@ const Routes: React.FC = () => {
 
       <SectionTitle>Rutas Destacadas</SectionTitle>
       <FeaturedRoutesGrid>
-        {featuredRoutes.map((route) => (
+        {paginatedFeaturedRoutes.map((route) => (
           <RouteCard key={route.id}>
             <RouteCardHeader difficulty={route.difficulty}>
               <div className="route-icon">
@@ -197,10 +206,27 @@ const Routes: React.FC = () => {
         ))}
       </FeaturedRoutesGrid>
 
+      {/* Controles de paginación para rutas destacadas */}
+      {totalFeaturedPages > 1 && (
+        <div style={{ display: 'flex', justifyContent: 'center', marginTop: '1rem', gap: '0.5rem' }}>
+          <button onClick={() => setCurrentFeaturedPage(p => Math.max(1, p - 1))} disabled={currentFeaturedPage === 1}>Anterior</button>
+          {Array.from({ length: totalFeaturedPages }, (_, i) => (
+            <button
+              key={i + 1}
+              onClick={() => setCurrentFeaturedPage(i + 1)}
+              style={{ fontWeight: currentFeaturedPage === i + 1 ? 'bold' : 'normal' }}
+            >
+              {i + 1}
+            </button>
+          ))}
+          <button onClick={() => setCurrentFeaturedPage(p => Math.min(totalFeaturedPages, p + 1))} disabled={currentFeaturedPage === totalFeaturedPages}>Siguiente</button>
+        </div>
+      )}
+
       <RecentlyAddedSection>
-        <SectionTitle>Agregadas Recientemente</SectionTitle>
+        <SectionTitle>Rutas Recientemente Añadidas</SectionTitle>
         <RecentRoutesList>
-          {recentlyAddedRoutes.map((route) => (
+          {paginatedRecentlyAddedRoutes.map((route) => (
             <RecentRouteItem key={route.id}>
               <div className="route-icon">
                 {getRouteIcon(route.difficulty)}
@@ -227,6 +253,23 @@ const Routes: React.FC = () => {
             </RecentRouteItem>
           ))}
         </RecentRoutesList>
+
+        {/* Controles de paginación para rutas recientes */}
+        {totalRecentPages > 1 && (
+          <div style={{ display: 'flex', justifyContent: 'center', marginTop: '1rem', gap: '0.5rem' }}>
+            <button onClick={() => setCurrentRecentPage(p => Math.max(1, p - 1))} disabled={currentRecentPage === 1}>Anterior</button>
+            {Array.from({ length: totalRecentPages }, (_, i) => (
+              <button
+                key={i + 1}
+                onClick={() => setCurrentRecentPage(i + 1)}
+                style={{ fontWeight: currentRecentPage === i + 1 ? 'bold' : 'normal' }}
+              >
+                {i + 1}
+              </button>
+            ))}
+            <button onClick={() => setCurrentRecentPage(p => Math.min(totalRecentPages, p + 1))} disabled={currentRecentPage === totalRecentPages}>Siguiente</button>
+          </div>
+        )}
       </RecentlyAddedSection>
 
       <CommunitySection>

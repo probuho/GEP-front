@@ -204,6 +204,12 @@ function Especies () {
     const [searchTerm, setSearchTerm] = useState("");
     const { auth } = useAuth();
 
+    // Paginación
+    const [currentPage, setCurrentPage] = useState(1);
+    const pageSize = 10;
+    const totalPages = Math.ceil(filteredEspecies.length / pageSize);
+    const paginatedEspecies = filteredEspecies.slice((currentPage - 1) * pageSize, currentPage * pageSize);
+
     useEffect(() => {
         setLoading(true);
         axios.get(`${BACKEND_URL}/especies`)
@@ -236,11 +242,11 @@ function Especies () {
             const filtered = especies.filter(especie => 
                 especie.nombre.toLowerCase().includes(searchTerm.toLowerCase()) ||
                 especie.tipo.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                especie.habitat.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                especie.alimentacion.toLowerCase().includes(searchTerm.toLowerCase())
+                especie.habitat.toLowerCase().includes(searchTerm.toLowerCase())
             );
             setFilteredEspecies(filtered);
         }
+        setCurrentPage(1); // Reiniciar a la primera página al buscar
     }, [searchTerm, especies]);
     
     const handleDelete = (id: string) => {
@@ -327,7 +333,7 @@ function Especies () {
                         </tr>
                     </thead>
                     <tbody>
-                        {filteredEspecies.length === 0 ? (
+                        {paginatedEspecies.length === 0 ? (
                             <tr>
                                 <td colSpan={auth?.user ? 8 : 7}>
                                     <EmptyState>
@@ -336,7 +342,7 @@ function Especies () {
                                 </td>
                             </tr>
                         ) : (
-                            filteredEspecies.map((especie) => (
+                            paginatedEspecies.map((especie) => (
                                 <tr key={especie.id}>
                                     <td>{getEspecieIcon(especie.tipo)} {especie.tipo}</td>
                                     <td>{especie.nombre}</td>
@@ -365,6 +371,23 @@ function Especies () {
                     </tbody>
                 </StyledTable>
             </TableContainer>
+
+            {/* Controles de paginación */}
+            {totalPages > 1 && (
+                <div style={{ display: 'flex', justifyContent: 'center', marginTop: '1rem', gap: '0.5rem' }}>
+                    <button onClick={() => setCurrentPage(p => Math.max(1, p - 1))} disabled={currentPage === 1}>Anterior</button>
+                    {Array.from({ length: totalPages }, (_, i) => (
+                        <button
+                            key={i + 1}
+                            onClick={() => setCurrentPage(i + 1)}
+                            style={{ fontWeight: currentPage === i + 1 ? 'bold' : 'normal' }}
+                        >
+                            {i + 1}
+                        </button>
+                    ))}
+                    <button onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))} disabled={currentPage === totalPages}>Siguiente</button>
+                </div>
+            )}
         </EspeciesContainer>
     ) 
 };
